@@ -14,5 +14,4 @@ router.put('/:id',verifyToken,EditNotes);
 
 router.delete('/:id',verifyToken,deleteNote);
 
-
 export default router;
