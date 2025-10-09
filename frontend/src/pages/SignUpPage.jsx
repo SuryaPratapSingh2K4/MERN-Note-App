@@ -1,19 +1,51 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { FaRegEye } from 'react-icons/fa'
 
 function SignUpPage() {
     const [isShowPassword, setIsShowPassword] = useState(false);
-    const [name, setName] = useState("")
+    const [fullname, setfullname] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const togglePassword = () => {
         setIsShowPassword(!isShowPassword)
     }
     const handleSignUp = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        if (!fullname || !email || !password) {
+            alert("Please fill all fields");
+            setLoading(false);
+            return;
+        }
+        try {
+            const response = await fetch('http://localhost:7000/api/users/signup', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ fullname, email, password })
+            })
+            const data = await response.json();
+            if (!response.ok) {
+                alert(data.message || "SignUp Failed")
+                return;
+            }
+            localStorage.setItem("user", JSON.stringify(data.user))
+            if (data.token) {
+                localStorage.setItem("token", data.token)
+            }
+            setLoading(false)
+            navigate("/login")
+            // setLoading(false);
+        } catch (error) {
+            console.error(error.message);
+            setLoading(false)
+        }
     }
     return (
         <div>
@@ -45,8 +77,8 @@ function SignUpPage() {
                                 type="text"
                                 required
                                 placeholder="Name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={fullname}
+                                onChange={(e) => setfullname(e.target.value)}
                             />
                         </label>
 
@@ -105,7 +137,7 @@ function SignUpPage() {
                         </p>
 
 
-                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">Create Account</button>
+                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">{loading ? "Creating" : "Create Acoount"}</button>
                         <h4 className='text-center'>Already have an account. <Link to={'/login'} className='underline font-bold'>Login here</Link></h4>
                     </form>
                 </div>

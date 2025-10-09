@@ -1,6 +1,6 @@
 import React from 'react'
 import Navbar from '../components/Navbar'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { FaRegEye } from 'react-icons/fa'
 
@@ -8,16 +8,49 @@ function LoginPage() {
     const [isShowPassword, setIsShowPassword] = useState(false);
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const togglePassword = () => {
         setIsShowPassword(!isShowPassword)
     }
     const handleLogin = async (e) => {
         e.preventDefault();
-        
+        setLoading(true);
+        try {
+            const response = await fetch('http://localhost:7000/api/users/login', {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            })
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                console.error(data.message || "Login failed");
+                setLoading(false);
+                return;
+            }
+
+            localStorage.setItem("token", data.token)
+            localStorage.setItem("user", JSON.stringify(data.user))
+            navigate("/dashboard")
+        } catch (error) {
+            console.error("Something went wrong. Please try again.", error.message)
+            setLoading(false)
+        }
+
     }
     return (
         <div>
-            <Navbar />
+            <div className='bg-base-300 px-4 py-3 shadow-md'>
+                <div className="flex items-center justify-between w-full flex-wrap gap-3">
+                <h2 className="text-xl font-semibold text-white whitespace-nowrap">
+                    Notes
+                </h2>
+            </div>
+            </div>
             <div className='flex flex-col items-center justify-center mt-16'>
                 <div className='flex flex-col bg-base-300 px-7 py-10 rounded w-96'>
                     <form onSubmit={handleLogin} className='flex flex-col gap-4'>
@@ -73,7 +106,7 @@ function LoginPage() {
                         </label>
 
 
-                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">Login</button>
+                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">{loading ? "Logging in.." : "Login"}</button>
                         <h4 className='text-center'>Not registered yet? <Link to={'/signup'} className='underline font-bold'>Create an Account</Link></h4>
                     </form>
                 </div>
