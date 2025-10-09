@@ -105,7 +105,7 @@ function SignUpPage() {
                         </p>
 
 
-                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">Login</button>
+                        <button type='submit' className="btn btn-neutral btn-outline text-white bg-green-600 hover:bg-green-700">Create Account</button>
                         <h4 className='text-center'>Already have an account. <Link to={'/login'} className='underline font-bold'>Login here</Link></h4>
                     </form>
                 </div>
