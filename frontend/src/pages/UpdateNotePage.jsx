@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom';
 import { getInitials } from '../utils/getInitials';
+import toast from 'react-hot-toast';
 
 function UpdateNotePage() {
 
@@ -70,7 +71,8 @@ function UpdateNotePage() {
             })
             const data = await res.json();
             if (res.ok) {
-                alert("Note Updated Successfully")
+                // alert("Note Updated Successfully")
+                toast.success("Note updated successfully ✅");
                 navigate("/dashboard")
             } else {
                 console.log("failed to update the errors", data.message);

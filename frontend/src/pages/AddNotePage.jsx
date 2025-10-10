@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getInitials } from '../utils/getInitials';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 function AddNotePage() {
     const [title, setTitle] = useState("");
@@ -34,13 +35,17 @@ function AddNotePage() {
                 body: JSON.stringify({ title, content, tags })
             });
 
-            const data = await response.json();
+            // const data = await response.json();
 
             if (response.ok) {
-                alert("Note added successfully!");
+                // alert("Note added successfully!");
+                toast.success("Note created successfully 🎉")
                 navigate("/dashboard"); // go back to homepage after adding
             } else {
-                alert(data.message || "Failed to add note");
+                // alert(data.message || "Failed to add note");
+                toast.error("Failed to create note ❌")
+                // console.error();
+                
             }
         } catch (error) {
             console.error("Error adding note:", error.message);
@@ -59,7 +64,7 @@ function AddNotePage() {
                             <div className="dropdown dropdown-end">
                                 <div tabIndex={0} role="button">
                                     <div className="w-10 h-10 flex items-center justify-center text-black rounded-full bg-gray-100 font-medium">
-                                        {getInitials(userInfo.name)}
+                                        {getInitials(userInfo.fullname)}
                                     </div>
                                 </div>
                                 <ul
@@ -72,8 +77,8 @@ function AddNotePage() {
                                 </ul>
                             </div>
 
-                            <div className="text-right text-white">
-                                <p className="text-sm font-medium">{userInfo.name}</p>
+                            <div className="text-left text-white">
+                                <p className="text-sm font-medium">{userInfo.fullname}</p>
                                 <p className="text-xs text-gray-300">{userInfo.email}</p>
                             </div>
                         </div>
