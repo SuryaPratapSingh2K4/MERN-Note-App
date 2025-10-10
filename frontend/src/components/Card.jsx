@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
+import { truncateString } from "../utils/truncateString";
+import Modal from "./Modal";
 
-export default function Card({ _id, title, content, tags, date }) {
+export default function Card({ _id, title, content, tags, createDate, updateDate }) {
     const navigate = useNavigate();
-    console.log("Received date for note:", date);
+    const [showModal, setShowModal] = useState(false)
+    console.log("Received date for note:", createDate);
 
     const handleEdit = () => {
         navigate(`/edit/${_id}`);
@@ -35,9 +38,12 @@ export default function Card({ _id, title, content, tags, date }) {
     };
 
     return (
-        
-        <div className="p-4 bg-base-200 rounded shadow hover:shadow-lg">
-            
+
+        <div className="p-4 bg-base-200 rounded shadow hover:shadow-lg cursor-pointer" onClick={() => { setShowModal(true) }}>
+            {showModal && (
+                <Modal id={_id} title={title} content={content} tags={tags} date={createDate} onClose={() => { setShowModal(false) }} />
+            )}
+
             <div className="flex justify-between items-start mb-2">
                 <h2 className="font-bold text-lg">{title}</h2>
                 <div className="flex gap-2">
@@ -51,12 +57,19 @@ export default function Card({ _id, title, content, tags, date }) {
                     />
                 </div>
             </div>
-
-            <p className="text-sm font-semibold italic text-gray-500 mb-2">
-                {formatDate(new Date(date))}
+            <p className="text-sm text-white-700 mb-2 line-clamp-3 break-words">
+                {truncateString(content)}
             </p>
-            <p className="mb-2">{content.slice(0, 100)}{content.length > 100 ? "..." : ""}</p>
-            {tags && <p className="text-xs text-gray-400">Tags: {tags}</p>}
+
+            {tags && <p className="text-xs text-gray-400 mb-2">Tags: {tags}</p>}
+
+            <p className="text-sm font-semibold italic text-gray-500 ">
+                CreatedAt :  {formatDate(new Date(createDate))}
+            </p>
+            <p className="text-sm font-semibold italic text-gray-500 mb-2">
+                UpdatedAt : {formatDate(new Date(updateDate))}
+            </p>
+
         </div>
     );
 }

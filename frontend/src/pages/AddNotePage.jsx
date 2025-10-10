@@ -83,7 +83,7 @@ function AddNotePage() {
 
             {/* Form */}
             <div className='px-4 sm:px-6 md:px-8 lg:px-12 xl:px-8 py-2'>
-                <div className='flex flex-col items-center justify-center mt-16'>
+                <div className='flex flex-col items-center justify-center mt-8'>
                     <div className='w-full max-w-2xl flex flex-col bg-base-300 px-10 py-12 rounded '>
                         <form onSubmit={handleAddNotes} className='flex flex-col gap-4'>
                             <h4 className='text-2xl mb-4 font-bold'>Create Note</h4>
@@ -103,6 +103,7 @@ function AddNotePage() {
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 className="textarea textarea-md w-full"
+                                rows={7}
                             ></textarea>
 
                             <input
@@ -115,11 +116,11 @@ function AddNotePage() {
                             />
 
                             <div className='flex gap-4 justify-center mt-2'>
-                                <button type='submit' className="btn btn-green">Add Note</button>
+                                <button type='submit' className="bg-green-600 px-3 py-2 rounded hover:bg-green-700">Add Note</button>
                                 <button
                                     type='button'
                                     onClick={() => navigate('/dashboard')}
-                                    className="btn btn-red"
+                                    className="bg-red-600 px-3 py-2 rounded hover:bg-red-700"
                                 >
                                     Cancel
                                 </button>
