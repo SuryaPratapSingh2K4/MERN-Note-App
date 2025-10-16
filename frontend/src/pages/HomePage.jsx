@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Card from "../components/Card";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function HomePage() {
     const [notes, setNotes] = useState([]);
@@ -10,7 +11,7 @@ export default function HomePage() {
     const [search, setSearch] = useState("");
     const navigate = useNavigate();
 
-    // Fetch notes from backend
+    // Fetch notes
     useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem("token");
@@ -21,36 +22,89 @@ export default function HomePage() {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
-                const sortedData = data.sort(
-                    (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                );
-                setNotes(sortedData);
-            } catch (error) {
-                console.error("Failed to fetch notes:", error.message);
+
+                // Sort pinned first, then by createdAt
+                const sorted = data.sort((a, b) => {
+                    if (a.pinned === b.pinned) return new Date(b.createdAt) - new Date(a.createdAt);
+                    return b.pinned - a.pinned; // pinned first
+                });
+
+                setNotes(sorted);
+            } catch (err) {
+                console.error("Failed to fetch notes:", err.message);
+                toast.error("Failed to fetch notes");
             }
         };
+
         fetchData();
     }, []);
 
-    // Filter notes based on search input
+    // Search filter
     useEffect(() => {
-        if (!search) {
-            setFilteredNotes(notes);
-        } else {
-            const lowerSearch = search.toLowerCase();
-            const filtered = notes.filter((n) => {
-                const title = (n.title || "").toLowerCase();
-                const content = (n.content || "").toLowerCase();
-                const tags = n.tags ? n.tags.toString().toLowerCase() : "";
-                return (
-                    title.includes(lowerSearch) ||
-                    content.includes(lowerSearch) ||
-                    tags.includes(lowerSearch)
-                );
+        if (!search) return setFilteredNotes(notes);
+
+        const lowerSearch = search.toLowerCase();
+        const filtered = notes.filter((note) => {
+            const title = note.title?.toLowerCase() || "";
+            const content = note.content?.toLowerCase() || "";
+            const tags = note.tags?.join(" ").toLowerCase() || "";
+            return title.includes(lowerSearch) || content.includes(lowerSearch) || tags.includes(lowerSearch);
+        });
+
+        setFilteredNotes(filtered);
+    }, [search, notes]);
+
+    // Toggle pin
+    const togglePin = async (id) => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+            const res = await fetch(`http://localhost:7000/api/notes/${id}`, {
+                method: "PATCH",
+                headers: { Authorization: `Bearer ${token}` },
             });
-            setFilteredNotes(filtered);
+
+            if (!res.ok) throw new Error("Failed to toggle pin");
+            const updatedNote = await res.json();
+
+            setNotes((prev) =>
+                prev
+                    .map((note) => (note._id === id ? { ...note, pinned: updatedNote.pinned } : note))
+                    .sort((a, b) => {
+                        if (a.pinned === b.pinned) return new Date(b.createdAt) - new Date(a.createdAt);
+                        return b.pinned - a.pinned;
+                    })
+            );
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to toggle pin");
         }
-    }, [notes, search]);
+    };
+
+    // Delete note
+    const deleteNote = async (id) => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        try {
+            const res = await fetch(`http://localhost:7000/api/notes/${id}`, {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                toast.success("Note deleted successfully 🗑️");
+                setNotes((prev) => prev.filter((note) => note._id !== id));
+            } else {
+                toast.error(data.message || "Failed to delete note");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to delete note");
+        }
+    };
 
     return (
         <div className="min-h-screen bg-base-900">
@@ -89,6 +143,9 @@ export default function HomePage() {
                             tags={note.tags}
                             createDate={note.createdAt}
                             updateDate={note.updatedAt}
+                            pinned={note.pinned}
+                            onTogglePin={togglePin}
+                            onDelete={deleteNote}
                         />
                     ))
                 )}

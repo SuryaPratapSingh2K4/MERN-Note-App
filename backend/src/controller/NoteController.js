@@ -87,3 +87,19 @@
         res.status(500).json({ message: "Error in deleteing the Notes" });
     }
     }
+
+    export async function PinnedNotes(req, res) {
+        try {
+            const user = req.user;
+            const note = await Note.findOne({_id: req.params.id, userId: user._id});
+            if(!note) {
+                return res.status(404).json({ message: "Note not found" });
+            }
+            note.pinned = !note.pinned;
+            note.save();
+            res.status(200).json(note);
+
+        } catch (error) {
+            res.status(500).json({ message: "Error in pinning the Note" });
+        }
+    }

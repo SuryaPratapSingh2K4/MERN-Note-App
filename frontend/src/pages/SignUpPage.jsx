@@ -49,7 +49,12 @@ function SignUpPage() {
     }
     return (
         <div>
-            <Navbar />
+                    <nav className="bg-base-300 px-4 py-3 shadow-md w-full">
+                            <h1 className="text-xl px-3 font-bold text-white flex-shrink-0">
+                                Notes
+                            </h1>
+
+                    </nav>
             <div className='flex flex-col items-center justify-center mt-16'>
                 <div className='flex flex-col bg-base-300 px-7 py-10 rounded w-96'>
                     <form onSubmit={handleSignUp} className='flex flex-col gap-4'>

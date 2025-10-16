@@ -1,45 +1,46 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaThumbtack } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
 import { truncateString } from "../utils/truncateString";
 import Modal from "./Modal";
-import toast from "react-hot-toast";
 
-export default function Card({ _id, title, content, tags, createDate, updateDate }) {
+export default function Card({ _id, title, content, tags, createDate, updateDate, pinned, onDelete, onPinToggle }) {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+    const [isPinned, setIsPinned] = useState(pinned);
 
     const handleEdit = (e) => {
-        e.stopPropagation(); // prevent modal
+        e.stopPropagation();
         navigate(`/edit/${_id}`);
     };
 
-    const handleDelete = async (e) => {
-        e.stopPropagation(); // prevent modal
+    const handleDelete = (e) => {
+        e.stopPropagation();
+        if (onDelete) onDelete(_id);
+    };
 
-        const token = localStorage.getItem("token");
-        if (!token) return;
-
+    const handleTogglePin = async (e) => {
+        e.stopPropagation();
         try {
+            const token = localStorage.getItem("token");
+
             const res = await fetch(`http://localhost:7000/api/notes/${_id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}` },
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
             });
+
+            if (!res.ok) throw new Error("Failed to toggle pin");
+
             const data = await res.json();
-            if (res.ok) {
-                
-                toast.success("Note deleted successfully 🗑️");
-                setTimeout(() => {
-                    window.location.reload()
-                }, 500);
-                 // call parent to reload notes
-            } else {
-                toast.error(data.message || "Failed to delete note");
-            }
+            setIsPinned(data.pinned); // update local state
+            if (onPinToggle) onPinToggle(_id, data.pinned); // optional: update parent
         } catch (err) {
             console.error(err);
-            toast.error("Failed to delete note");
+            alert("Failed to toggle pin");
         }
     };
 
@@ -62,6 +63,10 @@ export default function Card({ _id, title, content, tags, createDate, updateDate
             <div className="flex justify-between items-start mb-2">
                 <h2 className="font-bold text-lg">{title}</h2>
                 <div className="flex gap-2">
+                    <FaThumbtack
+                        className={`cursor-pointer ${isPinned ? "text-yellow-400" : "text-gray-300 hover:text-yellow-400"}`}
+                        onClick={handleTogglePin}
+                    />
                     <FaEdit
                         className="cursor-pointer hover:text-blue-500"
                         onClick={handleEdit}
@@ -77,7 +82,7 @@ export default function Card({ _id, title, content, tags, createDate, updateDate
                 {truncateString(content)}
             </p>
 
-            {tags && <p className="text-xs text-gray-400 mb-2">Tags: {tags}</p>}
+            {tags && <p className="text-xs text-gray-400 mb-2">Tags: {tags.join(", ")}</p>}
 
             <p className="text-sm font-semibold italic text-gray-500">
                 Created At: {formatDate(new Date(createDate))}

@@ -45,7 +45,7 @@ function AddNotePage() {
                 // alert(data.message || "Failed to add note");
                 toast.error("Failed to create note ❌")
                 // console.error();
-                
+
             }
         } catch (error) {
             console.error("Error adding note:", error.message);

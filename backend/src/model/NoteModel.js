@@ -26,6 +26,10 @@
         type: Date,
         default: Date.now,
         },
+        pinned: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true,
