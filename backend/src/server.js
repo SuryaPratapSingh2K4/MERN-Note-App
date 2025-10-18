@@ -20,3 +20,5 @@ connectDB().then(() => {
     });
 });
 
+export default app;
+

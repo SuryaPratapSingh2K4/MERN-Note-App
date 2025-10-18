@@ -1,0 +1,12 @@
+{
+  "name": "mern-note-app",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
+  },
+  "dependencies": {
+    "express": "^4.19.0",
+    "cors": "^2.8.5",
+    "mongoose": "^8.5.0"
+  }
+}

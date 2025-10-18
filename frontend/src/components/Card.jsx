@@ -25,7 +25,7 @@ export default function Card({ _id, title, content, tags, createDate, updateDate
         try {
             const token = localStorage.getItem("token");
 
-            const res = await fetch(`http://localhost:7000/api/notes/${_id}`, {
+            const res = await fetch(`/api/notes/${_id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",

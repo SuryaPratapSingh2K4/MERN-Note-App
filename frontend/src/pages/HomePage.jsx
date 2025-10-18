@@ -18,7 +18,7 @@ export default function HomePage() {
             if (!token) return;
 
             try {
-                const res = await fetch("http://localhost:7000/api/notes", {
+                const res = await fetch("/api/notes", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const data = await res.json();
@@ -60,7 +60,7 @@ export default function HomePage() {
         if (!token) return;
 
         try {
-            const res = await fetch(`http://localhost:7000/api/notes/${id}`, {
+            const res = await fetch(`/api/notes/${id}`, {
                 method: "PATCH",
                 headers: { Authorization: `Bearer ${token}` },
             });

@@ -40,7 +40,7 @@ function UpdateNotePage() {
             try {
                 setLoading(true);
                 const token = await localStorage.getItem("token");
-                const res = await fetch(`http://localhost:7000/api/notes/${id}`, {
+                const res = await fetch(`/api/notes/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const data = await res.json();
@@ -61,7 +61,7 @@ function UpdateNotePage() {
         e.preventDefault();
         try {
             const token = await localStorage.getItem("token");
-            const res = await fetch(`http://localhost:7000/api/notes/${id}`, {
+            const res = await fetch(`/api/notes/${id}`, {
                 method: "PUT",
                 headers: {
                     "content-type": "application/json",

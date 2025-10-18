@@ -26,7 +26,7 @@ function AddNotePage() {
         e.preventDefault();
         try {
             const token = localStorage.getItem("token");
-            const response = await fetch("http://localhost:7000/api/notes/addNotes", {
+            const response = await fetch("/api/notes/addNotes", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
